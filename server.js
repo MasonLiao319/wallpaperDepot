@@ -4,7 +4,7 @@ import usersRouter from './routes/users.js';
 import productsRouter from './routes/products.js';
 import session from 'express-session';
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 const app = express();
 
 // middleware

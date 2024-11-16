@@ -2,49 +2,46 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
-
 const prisma = new PrismaClient();
 
+// Route to get all products
 router.get('/all', async (req, res) => {
-    const products = await prisma.products.findMany();
+  try {
+    const products = await prisma.product.findMany();
     if (products.length === 0) {
-      res.status(404).json({ message: 'No wallpapers found' }); // Responds with 404 if no records are found
-    } else {
-      res.json(products); // Responds with the list of wallpapers as a JSON array
+      return res.status(404).json({ message: 'No products found' });
     }
-  });
-  
-  
-  // Get a contact by id
-  router.get('/:id', async (req, res) => {
-    const id = req.params.id;
-  
-    //validation: id is a number
-    if (isNaN(id)) {
-      res.status(400).json({ message: 'Invalid wallpaper ID' });
-      return;
-    }
-  
-    //By ID
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Route to get a product by ID
+router.get('/:id', async (req, res) => {
+  const id = req.params.id;
+  if (isNaN(id)) {
+    return res.status(400).json({ message: 'Invalid product ID' });
+  }
+
+  try {
     const product = await prisma.product.findUnique({
-  
-      // where clause
-      where: {
-        id: parseInt(id),
-      },
+      where: { id: parseInt(id) },
     });
-  
-  
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).json({ message: 'Wallpaper not found.' });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
     }
-  
-  });
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
-  
+
+
 
 
 export default router;
